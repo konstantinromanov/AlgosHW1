@@ -11,18 +11,51 @@ class ArrayBase {
 private:
 
 	static const int m_defaultSize = 5;
-	T* storeArray;
-	int m_size;
+	T* storeArray;	
+	int m_capacity;
+	int m_currentCount = 0;
 
 public:
 
 	ArrayBase<T>(int arraySize = m_defaultSize) {
-		m_size = arraySize <= m_defaultSize ? m_defaultSize : arraySize;
-		storeArray = new T[m_size];
+		m_capacity = arraySize <= m_defaultSize ? m_defaultSize : arraySize;
+		storeArray = new T[m_capacity];
 	}
 
 	int count() {
-		return m_size;
+		return m_currentCount;
+	}
+
+	int capacity() {
+		return m_capacity;
+	}
+
+	int add(T obj) {
+
+		if (m_currentCount < m_capacity)
+		{
+			storeArray[m_currentCount++] = obj;
+			return  m_currentCount;
+		}
+		
+		return -1;
+	}
+
+	void removeAt(int index) {
+
+		if (index >= 0 && index <= m_currentCount)
+		{
+			for (size_t i = index; i < m_currentCount - 1; i++)
+			{
+				storeArray[i] = storeArray[i + 1];
+			}
+
+			m_currentCount--;
+		}
+	}
+
+	T elementAt(int index) {
+		return storeArray[index];
 	}
 };
 
@@ -36,9 +69,27 @@ int main()
 {
 
 	ArrayBase<int> arr = ArrayBase<int>(3);
+	std::cout << "capacity" << arr.capacity() << std::endl;
+	std::cout << "count" << arr.count() << std::endl;
+	int ind0 = arr.add(1);
+	int ind1 = arr.add(2);
+	int ind2 = arr.add(3);
+	int ind3 = arr.add(4);
+	int ind5 = arr.add(5);
+	int ind6 = arr.add(6);
+	int ind7 = arr.add(7);
+	std::cout << "capacity" << arr.capacity() << std::endl;
+	std::cout << "count" << arr.count() << std::endl;
+	arr.removeAt(2);
+	//std::cout << "success" << std::endl;
+	
+	for (size_t i = 0; i < arr.count(); i++)
+	{
+		std::cout << arr.elementAt(i) << std::endl;
+	}
 
-	std::cout << "success" << std::endl;
-	std::cout << arr.count() << std::endl;
+	std::cout << "capacity" << arr.capacity() << std::endl;
+	std::cout << "count" << arr.count() << std::endl;
 	//std::stack<char> st;
 
 }
