@@ -4,24 +4,42 @@
 #include <iostream>
 #include <stack>
 
+template<typename T>
+class ArrayBase {
+
+
+private:
+
+	static const int m_defaultSize = 5;
+	T* storeArray;
+	int m_size;
+
+public:
+
+	ArrayBase<T>(int arraySize = m_defaultSize) {
+		m_size = arraySize <= m_defaultSize ? m_defaultSize : arraySize;
+		storeArray = new T[m_size];
+	}
+
+	int count() {
+		return m_size;
+	}
+};
+
+
+
+
+
+
+
 int main()
 {
-    //std::cout << "Hello World!\n";
 
+	ArrayBase<int> arr = ArrayBase<int>(3);
 
-
-
-
-
-    std::stack<char> st;
-
-
-  
-
-
-
-
-
+	std::cout << "success" << std::endl;
+	std::cout << arr.count() << std::endl;
+	//std::stack<char> st;
 
 }
 
