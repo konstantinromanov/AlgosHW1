@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <stack>
+#include <string>
+using namespace std;
 
 template<typename T>
 class ArrayBase {
-
 
 private:
 
@@ -59,38 +60,63 @@ public:
 	}
 };
 
+template<typename T>
+class Stack : ArrayBase<T> {
+
+private:
 
 
+public:
 
+	Stack<T>() {}
 
+	Stack<T>(int stackSize) : ArrayBase<T>(stackSize) {
+
+	}
+
+	void Push(T arg) {
+
+		ArrayBase<T>::add(arg);
+	}
+
+	T Peek() {
+		return ArrayBase<T>::elementAt(0);
+	}
+};
 
 
 int main()
 {
 
-	ArrayBase<int> arr = ArrayBase<int>(3);
-	std::cout << "capacity" << arr.capacity() << std::endl;
-	std::cout << "count" << arr.count() << std::endl;
-	int ind0 = arr.add(1);
-	int ind1 = arr.add(2);
-	int ind2 = arr.add(3);
-	int ind3 = arr.add(4);
-	int ind5 = arr.add(5);
-	int ind6 = arr.add(6);
-	int ind7 = arr.add(7);
-	std::cout << "capacity" << arr.capacity() << std::endl;
-	std::cout << "count" << arr.count() << std::endl;
-	arr.removeAt(2);
-	//std::cout << "success" << std::endl;
-	
-	for (size_t i = 0; i < arr.count(); i++)
-	{
-		std::cout << arr.elementAt(i) << std::endl;
-	}
+	Stack<string> stack = Stack<string>(5);
+	stack.Push("33dd");
 
-	std::cout << "capacity" << arr.capacity() << std::endl;
-	std::cout << "count" << arr.count() << std::endl;
-	//std::stack<char> st;
+	std::cout << stack.Peek() << std::endl;
+
+
+	//ArrayBase<int> arr = ArrayBase<int>(3);
+	//std::cout << "capacity" << arr.capacity() << std::endl;
+	//std::cout << "count" << arr.count() << std::endl;
+	//int ind0 = arr.add(1);
+	//int ind1 = arr.add(2);
+	//int ind2 = arr.add(3);
+	//int ind3 = arr.add(4);
+	//int ind5 = arr.add(5);
+	//int ind6 = arr.add(6);
+	//int ind7 = arr.add(7);
+	//std::cout << "capacity" << arr.capacity() << std::endl;
+	//std::cout << "count" << arr.count() << std::endl;
+	//arr.removeAt(2);
+	////std::cout << "success" << std::endl;
+	//
+	//for (size_t i = 0; i < arr.count(); i++)
+	//{
+	//	std::cout << arr.elementAt(i) << std::endl;
+	//}
+
+	//std::cout << "capacity" << arr.capacity() << std::endl;
+	//std::cout << "count" << arr.count() << std::endl;
+	////std::stack<char> st;
 
 }
 
