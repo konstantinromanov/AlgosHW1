@@ -19,10 +19,14 @@ private:
 
 public:
 
-	ArrayBase<T>(int arraySize = m_defaultSize) {
+	ArrayBase(int arraySize = m_defaultSize) {
 		m_capacity = arraySize <= m_defaultSize ? m_defaultSize : arraySize;
 		storeArray = new T[m_capacity];
 	}
+
+	T& operator[](int index) {
+		return storeArray[index];
+	};
 
 	int count() {
 		return m_currentCount;
@@ -92,9 +96,9 @@ class Stack : ArrayBase<T> {
 
 public:
 
-	Stack<T>() {}
+	Stack() {}
 
-	Stack<T>(int stackSize) : ArrayBase<T>(stackSize) {
+	Stack(int stackSize) : ArrayBase<T>(stackSize) {
 
 	}
 
@@ -115,7 +119,7 @@ public:
 			throw out_of_range("Stack is empty");
 		}
 
-		T arg = ArrayBase<T>::elementAt(ArrayBase<T>::count() - 1);		
+		T arg = ArrayBase<T>::elementAt(ArrayBase<T>::count() - 1);
 		ArrayBase<T>::decCount();
 
 		return arg;
@@ -132,9 +136,121 @@ public:
 	}
 };
 
+template<typename T>
+class Queue : ArrayBase<T> {
+
+private:
+
+	int m_first = 0;
+	int m_last = 0;
+
+public:
+
+	Queue() {
+
+	}
+
+	Queue(int queueSize) : ArrayBase<T>(queueSize) {
+
+	}
+
+	bool enqueue(T next) {
+
+		ArrayBase<T>::incCount();
+		m_last = (m_first + ArrayBase<T>::count() - 1) % ArrayBase<T>::capacity();
+		ArrayBase<T>::operator[](m_last) = next;
+
+		return true;
+	}
+
+	T dequeue() {
+
+		T obj = ArrayBase<T>::elementAt(m_first);
+		ArrayBase<T>::decCount();
+		m_first = (m_first + 1) % ArrayBase<T>::capacity();
+
+		return obj;
+	}
+
+	void isEmpty() {
+
+	}
+
+	bool isFull() {
+		return ArrayBase<T>::isFull();
+	}
+
+	void display() {
+
+		int size = ArrayBase<T>::count();
+		for (int i = 0; i < size; i++)
+		{
+			T el = ArrayBase<T>::elementAt((m_first + i) % ArrayBase<T>::capacity());
+			cout << el << endl;
+		}
+	}
+
+	void clear() {
+
+	}
+
+	void size() {
+
+	}
+
+	void Test() {
+		cout << "test" << endl;
+	}
+};
+
 
 int main()
 {
+	//ArrayBase<int> arr = ArrayBase<int>(3);
+	//std::cout << "capacity" << arr.capacity() << std::endl;
+	//std::cout << "count" << arr.count() << std::endl;
+	//int ind0 = arr.add(1);
+	//int ind1 = arr[1] = 33;
+	//std::cout << "value0" << arr[0] << std::endl;
+	//std::cout << "value1" << arr[1] << std::endl;
+
+
+	Queue<int> queue = Queue<int>(6);
+	//queue.Test();
+
+	queue.enqueue(1);
+	queue.display();
+
+
+	queue.enqueue(2);
+	queue.display();
+
+	queue.enqueue(3);
+	queue.enqueue(4);
+	queue.enqueue(5);
+	queue.enqueue(6);
+	//queue.enqueue(7);
+	queue.display();
+
+	int el1 = queue.dequeue();
+	int el2 = queue.dequeue();
+	int el3 = queue.dequeue();
+	int el4 = queue.dequeue();
+
+	queue.display();
+
+	queue.enqueue(44);
+	queue.enqueue(54);
+	queue.enqueue(64);
+
+	queue.display();
+
+	int el5 = queue.dequeue();
+	int el6 = queue.dequeue();
+	int el7 = queue.dequeue();
+
+	queue.display();
+
 
 	Stack<string> stack = Stack<string>(6);
 	stack.Push("33dd");
