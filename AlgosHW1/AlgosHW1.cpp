@@ -26,9 +26,13 @@ public:
 
 	T& operator[](int index) {
 		return storeArray[index];
-	};
+	}
 
-	int count() {
+	bool isEmpty() const {
+		return m_currentCount == 0;
+	}
+
+	int size() {
 		return m_currentCount;
 	}
 
@@ -89,14 +93,18 @@ public:
 	bool isFull() {
 		return m_currentCount == m_capacity;
 	}
+
+
 };
 
 template<typename T>
-class Stack : ArrayBase<T> {
+class Stack : public ArrayBase<T> {
 
 public:
 
-	Stack() {}
+	Stack() {
+	
+	}
 
 	Stack(int stackSize) : ArrayBase<T>(stackSize) {
 
@@ -119,7 +127,7 @@ public:
 			throw out_of_range("Stack is empty");
 		}
 
-		T arg = ArrayBase<T>::elementAt(ArrayBase<T>::count() - 1);
+		T arg = ArrayBase<T>::elementAt(ArrayBase<T>::size() - 1);
 		ArrayBase<T>::decCount();
 
 		return arg;
@@ -127,17 +135,17 @@ public:
 
 	T Peek() {
 
-		if (ArrayBase<T>::count() == 0)
+		if (ArrayBase<T>::size() == 0)
 		{
 			throw std::out_of_range("Stack is empty");
 		}
 
-		return ArrayBase<T>::elementAt(ArrayBase<T>::count() - 1);
+		return ArrayBase<T>::elementAt(ArrayBase<T>::size() - 1);
 	}
 };
 
 template<typename T>
-class Queue : ArrayBase<T> {
+class Queue : public ArrayBase<T> {
 
 private:
 
@@ -157,7 +165,7 @@ public:
 	bool enqueue(T next) {
 
 		ArrayBase<T>::incCount();
-		m_last = (m_first + ArrayBase<T>::count() - 1) % ArrayBase<T>::capacity();
+		m_last = (m_first + ArrayBase<T>::size() - 1) % ArrayBase<T>::capacity();
 		ArrayBase<T>::operator[](m_last) = next;
 
 		return true;
@@ -165,25 +173,16 @@ public:
 
 	T dequeue() {
 
-		T obj = ArrayBase<T>::elementAt(m_first);
+		T* obj = ArrayBase<T>::elementAt(m_first);
 		ArrayBase<T>::decCount();
 		m_first = (m_first + 1) % ArrayBase<T>::capacity();
 
 		return obj;
 	}
 
-	void isEmpty() {
-
-	}
-
-	bool isFull() {
-		return ArrayBase<T>::isFull();
-	}
-
 	void display() {
 
-		int size = ArrayBase<T>::count();
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < ArrayBase<T>::size(); i++)
 		{
 			T el = ArrayBase<T>::elementAt((m_first + i) % ArrayBase<T>::capacity());
 			cout << el << endl;
@@ -191,10 +190,6 @@ public:
 	}
 
 	void clear() {
-
-	}
-
-	void size() {
 
 	}
 
@@ -213,60 +208,62 @@ int main()
 	//int ind1 = arr[1] = 33;
 	//std::cout << "value0" << arr[0] << std::endl;
 	//std::cout << "value1" << arr[1] << std::endl;
-
-
 	Queue<int> queue = Queue<int>(6);
+	bool isEmpty = queue.isEmpty();
+	bool isFull = queue.isFull();
+	int size = queue.size();
+	//Queue<int> queue = Queue<int>(6);
 	//queue.Test();
-
-	queue.enqueue(1);
-	queue.display();
-
-
-	queue.enqueue(2);
-	queue.display();
-
-	queue.enqueue(3);
-	queue.enqueue(4);
-	queue.enqueue(5);
-	queue.enqueue(6);
-	//queue.enqueue(7);
-	queue.display();
-
-	int el1 = queue.dequeue();
-	int el2 = queue.dequeue();
-	int el3 = queue.dequeue();
-	int el4 = queue.dequeue();
-
-	queue.display();
-
-	queue.enqueue(44);
-	queue.enqueue(54);
-	queue.enqueue(64);
-
-	queue.display();
-
-	int el5 = queue.dequeue();
-	int el6 = queue.dequeue();
-	int el7 = queue.dequeue();
-
-	queue.display();
+	//bool empty = queue.isEmpty();
+	//queue.enqueue(1);
+	//queue.display();
 
 
-	Stack<string> stack = Stack<string>(6);
-	stack.Push("33dd");
-	std::cout << stack.Peek() << std::endl;
+	//queue.enqueue(2);
+	//queue.display();
 
-	stack.Push("sdfassdfafd");
-	std::cout << stack.Peek() << std::endl;
+	//queue.enqueue(3);
+	//queue.enqueue(4);
+	//queue.enqueue(5);
+	//queue.enqueue(6);
+	////queue.enqueue(7);
+	//queue.display();
 
-	stack.Push("sdfassdfafd");
-	stack.Push("ddddd");
-	stack.Push("ccccc");
-	stack.Push("gggggggg");
-	std::cout << stack.Peek() << std::endl;
+	//int el1 = queue.dequeue();
+	//int el2 = queue.dequeue();
+	//int el3 = queue.dequeue();
+	//int el4 = queue.dequeue();
 
-	string pop1 = stack.Pop();
-	std::cout << stack.Peek() << std::endl;
+	//queue.display();
+
+	//queue.enqueue(44);
+	//queue.enqueue(54);
+	//queue.enqueue(64);
+
+	//queue.display();
+
+	//int el5 = queue.dequeue();
+	//int el6 = queue.dequeue();
+	//int el7 = queue.dequeue();
+
+	//queue.display();
+
+
+	//Stack<string> stack = Stack<string>(6);
+	//stack.Push("33dd");
+	//std::cout << stack.Peek() << std::endl;
+
+	//stack.Push("sdfassdfafd");
+	//std::cout << stack.Peek() << std::endl;
+
+	//stack.Push("sdfassdfafd");
+	//stack.Push("ddddd");
+	//stack.Push("ccccc");
+	//stack.Push("gggggggg");
+	//std::cout << stack.Peek() << std::endl;
+
+	//string pop1 = stack.Pop();
+	//std::cout << stack.Peek() << std::endl;
 
 
 
