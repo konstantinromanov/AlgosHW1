@@ -48,7 +48,7 @@ public:
 
 	void decCount() {
 
-		if (m_currentCount < 0)
+		if (m_currentCount == 0)
 		{
 			throw out_of_range("Array is already empty");
 		}
@@ -94,7 +94,11 @@ public:
 		return m_currentCount == m_capacity;
 	}
 
+	virtual void clear() = 0;
 
+	void resetSize() {
+		m_currentCount = 0;
+	}
 };
 
 template<typename T>
@@ -103,7 +107,7 @@ class Stack : public ArrayBase<T> {
 public:
 
 	Stack() {
-	
+
 	}
 
 	Stack(int stackSize) : ArrayBase<T>(stackSize) {
@@ -122,7 +126,7 @@ public:
 
 	T Pop() {
 
-		if (ArrayBase<T>::count() == 0)
+		if (ArrayBase<T>::size() == 0)
 		{
 			throw out_of_range("Stack is empty");
 		}
@@ -141,6 +145,10 @@ public:
 		}
 
 		return ArrayBase<T>::elementAt(ArrayBase<T>::size() - 1);
+	}
+
+	void clear() {
+		ArrayBase<T>::resetSize();
 	}
 };
 
@@ -172,12 +180,11 @@ public:
 	}
 
 	T dequeue() {
-
-		T* obj = ArrayBase<T>::elementAt(m_first);
+		int dequeuIndex = m_first;
 		ArrayBase<T>::decCount();
 		m_first = (m_first + 1) % ArrayBase<T>::capacity();
 
-		return obj;
+		return ArrayBase<T>::elementAt(dequeuIndex);
 	}
 
 	void display() {
@@ -190,7 +197,9 @@ public:
 	}
 
 	void clear() {
-
+		m_first = 0;
+		m_last = 0;
+		ArrayBase<T>::resetSize();
 	}
 
 	void Test() {
@@ -198,99 +207,89 @@ public:
 	}
 };
 
+void runTests() {
+
+	Queue<int> queue = Queue<int>(6);
+
+	for (size_t i = 0; i < 6; i++)
+	{
+		queue.enqueue(i + 1);
+	}
+	
+	bool test1 = queue.size() == 6;
+	cout << "Test 1 " << boolalpha << test1 << endl;
+
+	bool test2;
+
+	try
+	{
+		queue.enqueue(7);
+		bool test2 = false;
+	}
+	catch (const std::out_of_range&)
+	{
+		test2 = true;
+	}
+	
+	cout << "Test 2 " << boolalpha << test2 << endl;
+
+	int queueSize = queue.size();
+
+	for (int i = 0; i < queueSize; i++)
+	{
+		queue.dequeue();
+	}
+		
+	bool test3 = queue.size() == 0;
+
+	cout << "Test 3 " << boolalpha << test3 << endl;
+
+	bool test4;
+
+	try
+	{
+		queue.dequeue();
+		test4 = false;
+	}
+	catch (const std::out_of_range&)
+	{
+		test4 = true;
+	}
+	
+	cout << "Test 4 " << boolalpha << test3 << endl;
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		queue.enqueue(i + 1);
+	}
+
+	queue.clear();
+
+	bool test5 = queue.size() == 0;
+
+	cout << "Test 5 " << boolalpha << test5 << endl;
+
+	bool test6 = queue.isEmpty();
+
+	cout << "Test 6 " << boolalpha << test6 << endl;
+
+	bool test7 = !queue.isFull();
+
+	cout << "Test 7 " << boolalpha << test7 << endl;
+
+	for (size_t i = 0; i < 6; i++)
+	{
+		queue.enqueue(i + 1);
+	}
+
+	bool test8 = queue.isFull();
+
+	cout << "Test 8 " << boolalpha << test8 << endl;
+}
 
 int main()
 {
-	//ArrayBase<int> arr = ArrayBase<int>(3);
-	//std::cout << "capacity" << arr.capacity() << std::endl;
-	//std::cout << "count" << arr.count() << std::endl;
-	//int ind0 = arr.add(1);
-	//int ind1 = arr[1] = 33;
-	//std::cout << "value0" << arr[0] << std::endl;
-	//std::cout << "value1" << arr[1] << std::endl;
-	Queue<int> queue = Queue<int>(6);
-	bool isEmpty = queue.isEmpty();
-	bool isFull = queue.isFull();
-	int size = queue.size();
-	//Queue<int> queue = Queue<int>(6);
-	//queue.Test();
-	//bool empty = queue.isEmpty();
-	//queue.enqueue(1);
-	//queue.display();
-
-
-	//queue.enqueue(2);
-	//queue.display();
-
-	//queue.enqueue(3);
-	//queue.enqueue(4);
-	//queue.enqueue(5);
-	//queue.enqueue(6);
-	////queue.enqueue(7);
-	//queue.display();
-
-	//int el1 = queue.dequeue();
-	//int el2 = queue.dequeue();
-	//int el3 = queue.dequeue();
-	//int el4 = queue.dequeue();
-
-	//queue.display();
-
-	//queue.enqueue(44);
-	//queue.enqueue(54);
-	//queue.enqueue(64);
-
-	//queue.display();
-
-	//int el5 = queue.dequeue();
-	//int el6 = queue.dequeue();
-	//int el7 = queue.dequeue();
-
-	//queue.display();
-
-
-	//Stack<string> stack = Stack<string>(6);
-	//stack.Push("33dd");
-	//std::cout << stack.Peek() << std::endl;
-
-	//stack.Push("sdfassdfafd");
-	//std::cout << stack.Peek() << std::endl;
-
-	//stack.Push("sdfassdfafd");
-	//stack.Push("ddddd");
-	//stack.Push("ccccc");
-	//stack.Push("gggggggg");
-	//std::cout << stack.Peek() << std::endl;
-
-	//string pop1 = stack.Pop();
-	//std::cout << stack.Peek() << std::endl;
-
-
-
-	//ArrayBase<int> arr = ArrayBase<int>(3);
-	//std::cout << "capacity" << arr.capacity() << std::endl;
-	//std::cout << "count" << arr.count() << std::endl;
-	//int ind0 = arr.add(1);
-	//int ind1 = arr.add(2);
-	//int ind2 = arr.add(3);
-	//int ind3 = arr.add(4);
-	//int ind5 = arr.add(5);
-	//int ind6 = arr.add(6);
-	//int ind7 = arr.add(7);
-	//std::cout << "capacity" << arr.capacity() << std::endl;
-	//std::cout << "count" << arr.count() << std::endl;
-	//arr.removeAt(2);
-	////std::cout << "success" << std::endl;
-	//
-	//for (size_t i = 0; i < arr.count(); i++)
-	//{
-	//	std::cout << arr.elementAt(i) << std::endl;
-	//}
-
-	//std::cout << "capacity" << arr.capacity() << std::endl;
-	//std::cout << "count" << arr.count() << std::endl;
-	////std::stack<char> st;
-
+	runTests();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
