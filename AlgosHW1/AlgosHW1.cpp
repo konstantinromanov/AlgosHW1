@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <map>
 #include <iterator>
+#include <sstream>
+#include <vector>
 using namespace std;
 
 template<typename T>
@@ -85,7 +87,7 @@ public:
 		m_capacity = arraySize <= m_defaultSize ? m_defaultSize : arraySize;
 		storeArray = new T[m_capacity];
 	}
-	
+
 	bool isEmpty() const {
 		return m_currentCount == 0;
 	}
@@ -220,8 +222,8 @@ string convertInfixToPostfix(string expression) {
 		pair<char, int>('%', 3),
 		pair<char, int>('+', 2),
 		pair<char, int>('-', 2)
-	};	
-	
+	};
+
 	for (size_t i = 0; i < expression.size(); i++)
 	{
 		char currentChar = expression[i];
@@ -265,11 +267,79 @@ string convertInfixToPostfix(string expression) {
 	return resultExpression;
 }
 
+bool isNumber(const string& str)
+{
+	for (char const& c : str) {
+		if (std::isdigit(c) == 0) return false;
+	}
+	return true;
+}
+
+double evaluatePostfix(string expression) {
+
+	stringstream ss(expression);
+	vector<string> words{};
+	string word;
+
+	while (getline(ss, word, ' '))
+	{
+		if (word == "")
+		{
+			continue;
+		}
+
+		words.push_back(word.c_str());
+	}
+
+	double resultExpression;
+	Stack<double> stack = Stack<double>(expression.size());
+
+	for (size_t i = 0; i < words.size(); i++)
+	{
+		word = words[i];
+
+		if (isNumber(word))
+		{
+			stack.push(stod(word));
+		}
+		else
+		{
+			double firstOperand = double(stack.pop());
+			double secondOperand = double(stack.pop());
+			double operationResult = 0.0;
+
+			switch (word.at(0))
+			{
+			case '+':
+				operationResult = firstOperand + secondOperand;
+				break;
+			case '-':
+				operationResult = firstOperand - secondOperand;
+				break;
+			case '*':
+				operationResult = firstOperand * secondOperand;
+				break;
+			case '/':
+				operationResult = firstOperand / secondOperand;
+				break;				
+			case '^':
+				operationResult = pow(firstOperand, stod(word));
+				break;
+			default:
+				break;
+			}
+
+			stack.push(operationResult);
+		}
+	}
+
+	return stack.pop();
+}
 
 void runTests() {
-	
+
 	int queueLength = 6;
-	Queue<int> queue = Queue<int>(queueLength);	
+	Queue<int> queue = Queue<int>(queueLength);
 
 	// ---------------------------------- Test 1 ----------------------------------
 
@@ -284,12 +354,12 @@ void runTests() {
 
 	// ---------------------------------- Test 2 ----------------------------------
 
-	bool test2;
+	bool test2 = false;
 
 	try
 	{
 		queue.enqueue(7);
-		bool test2 = false;
+		test2 = false;
 	}
 	catch (const std::out_of_range&)
 	{
@@ -398,12 +468,29 @@ void runTests() {
 	bool test14 = "ABC*EF-/+" == convertInfixToPostfix("A+B*C/(E-F)");
 
 	printTestResult(14, test14);
+
+	// ---------------------------------- Test 15 ----------------------------------
+
+	bool test15 = 7 == evaluatePostfix("3 2 2 * +");
+
+	printTestResult(15, test15);
+
+	// ---------------------------------- Test 16 ----------------------------------
+
+	bool test16 = 7 == evaluatePostfix("3 2 2 * +");
+
+	printTestResult(16, test16);
+
+	// ---------------------------------- Test 17 ----------------------------------
+
+	bool test17 = 70 == evaluatePostfix("3 30 / 6 3 11 18 36 / + - * + ");
+
+	printTestResult(17, test17);
 }
 
 
 int main()
 {
-
 	runTests();
 }
 
