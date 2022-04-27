@@ -5,6 +5,8 @@
 #include <stack>
 #include <string>
 #include <stdexcept>
+#include <map>
+#include <iterator>
 using namespace std;
 
 template<typename T>
@@ -114,7 +116,7 @@ public:
 
 	}
 
-	void Push(T arg) {
+	void push(T arg) {
 
 		if (ArrayBase<T>::isFull())
 		{
@@ -124,7 +126,7 @@ public:
 		ArrayBase<T>::add(arg);
 	}
 
-	T Pop() {
+	T pop() {
 
 		if (ArrayBase<T>::size() == 0)
 		{
@@ -137,7 +139,7 @@ public:
 		return arg;
 	}
 
-	T Peek() {
+	T peek() {
 
 		if (ArrayBase<T>::size() == 0)
 		{
@@ -201,23 +203,99 @@ public:
 		m_last = 0;
 		ArrayBase<T>::resetSize();
 	}
-
-	void Test() {
-		cout << "test" << endl;
-	}
 };
+
+void printTestResult(int testNumber, bool testResult) {
+	cout << "Test " << testNumber << ": " << boolalpha << testResult << endl;
+}
+
+string convertInfixToPostfix(string expression) {
+
+	Stack<char> stack = Stack<char>(expression.size());
+	string resultExpression;
+	map<char, int> opPrecedence{
+		pair<char, int>('^', 4),
+		pair<char, int>('/', 3),
+		pair<char, int>('*', 3),
+		pair<char, int>('%', 3),
+		pair<char, int>('+', 2),
+		pair<char, int>('-', 2)		
+	};
+
+	auto evalOp = [](char op, map<char, int> mp) {
+
+		if (mp.find(op) == mp.end())
+		{
+			return -1;
+		}
+
+		return mp.at(op);
+	};
+
+	for (size_t i = 0; i < expression.size(); i++)
+	{
+		char currentChar = expression[i];
+
+		if (isalpha(currentChar) || isdigit(currentChar) || currentChar == '.')
+		{
+			resultExpression.push_back(currentChar);
+		}
+		else if (currentChar == ')')
+		{
+			while (stack.peek() != '(')
+			{
+				resultExpression.push_back(stack.pop());
+			}
+
+			stack.pop();
+		}
+		else if (currentChar == '(')
+		{
+			stack.add(currentChar);
+		}
+		else
+		{
+			while (!stack.isEmpty() && evalOp(currentChar, opPrecedence) <= evalOp(stack.peek(), opPrecedence))
+			{
+				if (currentChar == '^' && stack.peek() == '^')
+				{
+					break;
+				}
+
+				resultExpression.push_back(stack.pop());
+			}
+
+			stack.add(currentChar);
+		}
+	}
+
+	while (!stack.isEmpty())
+	{
+		resultExpression.push_back(stack.pop());
+	}
+
+	return resultExpression;
+}
+
 
 void runTests() {
 
-	Queue<int> queue = Queue<int>(6);
+	int queueLength = 6;
+	Queue<int> queue = Queue<int>(queueLength);
 
-	for (size_t i = 0; i < 6; i++)
+
+	// ---------------------------------- Test 1 ----------------------------------
+
+	for (int i = 0; i < queueLength; i++)
 	{
 		queue.enqueue(i + 1);
 	}
-	
-	bool test1 = queue.size() == 6;
-	cout << "Test 1 " << boolalpha << test1 << endl;
+
+	bool test1 = queue.size() == queueLength;
+
+	printTestResult(1, test1);
+
+	// ---------------------------------- Test 2 ----------------------------------
 
 	bool test2;
 
@@ -230,8 +308,10 @@ void runTests() {
 	{
 		test2 = true;
 	}
-	
-	cout << "Test 2 " << boolalpha << test2 << endl;
+
+	printTestResult(2, test2);
+
+	// ---------------------------------- Test 3 ----------------------------------
 
 	int queueSize = queue.size();
 
@@ -239,10 +319,12 @@ void runTests() {
 	{
 		queue.dequeue();
 	}
-		
+
 	bool test3 = queue.size() == 0;
 
-	cout << "Test 3 " << boolalpha << test3 << endl;
+	printTestResult(3, test3);
+
+	// ---------------------------------- Test 4 ----------------------------------
 
 	bool test4;
 
@@ -255,8 +337,10 @@ void runTests() {
 	{
 		test4 = true;
 	}
-	
-	cout << "Test 4 " << boolalpha << test3 << endl;
+
+	printTestResult(4, test4);
+
+	// ---------------------------------- Test 5 ----------------------------------
 
 	for (size_t i = 0; i < 3; i++)
 	{
@@ -267,25 +351,50 @@ void runTests() {
 
 	bool test5 = queue.size() == 0;
 
-	cout << "Test 5 " << boolalpha << test5 << endl;
+	printTestResult(5, test5);
+
+	// ---------------------------------- Test 6 ----------------------------------
 
 	bool test6 = queue.isEmpty();
 
-	cout << "Test 6 " << boolalpha << test6 << endl;
+	printTestResult(6, test6);
+
+	// ---------------------------------- Test 7 ----------------------------------
 
 	bool test7 = !queue.isFull();
 
-	cout << "Test 7 " << boolalpha << test7 << endl;
+	printTestResult(7, test7);
 
-	for (size_t i = 0; i < 6; i++)
+	// ---------------------------------- Test 8 ----------------------------------
+
+	for (size_t i = 0; i < queueLength; i++)
 	{
 		queue.enqueue(i + 1);
 	}
 
 	bool test8 = queue.isFull();
 
-	cout << "Test 8 " << boolalpha << test8 << endl;
+	printTestResult(8, test8);
+
+	// ---------------------------------- Test 9 ----------------------------------
+
+	bool test9 = "abcd^e-fgh*+^*+i-" == convertInfixToPostfix("a+b*(c^d-e)^(f+g*h)-i");
+	
+	printTestResult(9, test9);
+
+	// ---------------------------------- Test 10 ----------------------------------
+
+	bool test10 = "12.34+15*16-" == convertInfixToPostfix("(12.3+4)*15-16");
+
+	printTestResult(10, test10);
+
+	// ---------------------------------- Test 10 ----------------------------------
+
+	bool test11 = "AB+C*D-" == convertInfixToPostfix("(A+B)*C-D");
+
+	printTestResult(11, test11);
 }
+
 
 int main()
 {
