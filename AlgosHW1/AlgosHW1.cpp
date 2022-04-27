@@ -209,6 +209,8 @@ void printTestResult(int testNumber, bool testResult) {
 
 string convertInfixToPostfix(string expression) {
 
+	expression.erase(remove(expression.begin(), expression.end(), ' '), expression.end());
+
 	Stack<char> stack = Stack<char>(expression.size());
 	string resultExpression;
 	map<char, int> opPrecedence{
@@ -218,12 +220,8 @@ string convertInfixToPostfix(string expression) {
 		pair<char, int>('%', 3),
 		pair<char, int>('+', 2),
 		pair<char, int>('-', 2)
-	};
+	};	
 	
-	/*auto evalOp = [](char op, map<char, int> mp) {
-		return (mp.find(op) == mp.end()) ? -1 : mp.at(op);
-	};*/
-
 	for (size_t i = 0; i < expression.size(); i++)
 	{
 		char currentChar = expression[i];
@@ -367,7 +365,7 @@ void runTests() {
 
 	// ---------------------------------- Test 9 ----------------------------------
 
-	bool test9 = "abcd^e-fgh*+^*+i-" == convertInfixToPostfix("a+b*(c^d-e)^(f+g*h)-i");
+	bool test9 = "abcd^e-fgh*+^*+i-" == convertInfixToPostfix("a + b * (c^d-e)^(f+g*h)-i");
 
 	printTestResult(9, test9);
 
