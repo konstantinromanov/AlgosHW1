@@ -19,23 +19,10 @@ private:
 	int m_capacity;
 	int m_currentCount = 0;
 
-public:
+protected:
 
-	ArrayBase(int arraySize = m_defaultSize) {
-		m_capacity = arraySize <= m_defaultSize ? m_defaultSize : arraySize;
-		storeArray = new T[m_capacity];
-	}
-
-	T& operator[](int index) {
-		return storeArray[index];
-	}
-
-	bool isEmpty() const {
-		return m_currentCount == 0;
-	}
-
-	int size() {
-		return m_currentCount;
+	void resetSize() {
+		m_currentCount = 0;
 	}
 
 	void incCount() {
@@ -56,10 +43,6 @@ public:
 		}
 
 		m_currentCount--;
-	}
-
-	int capacity() {
-		return m_capacity;
 	}
 
 	int add(T obj) {
@@ -92,25 +75,40 @@ public:
 		return storeArray[index];
 	}
 
+	T& operator[](int index) {
+		return storeArray[index];
+	}
+
+public:
+
+	ArrayBase(int arraySize = m_defaultSize) {
+		m_capacity = arraySize <= m_defaultSize ? m_defaultSize : arraySize;
+		storeArray = new T[m_capacity];
+	}
+	
+	bool isEmpty() const {
+		return m_currentCount == 0;
+	}
+
+	int size() {
+		return m_currentCount;
+	}
+
+	int capacity() {
+		return m_capacity;
+	}
+
 	bool isFull() {
 		return m_currentCount == m_capacity;
 	}
 
 	virtual void clear() = 0;
-
-	void resetSize() {
-		m_currentCount = 0;
-	}
 };
 
 template<typename T>
 class Stack : public ArrayBase<T> {
 
 public:
-
-	Stack() {
-
-	}
 
 	Stack(int stackSize) : ArrayBase<T>(stackSize) {
 
@@ -219,24 +217,18 @@ string convertInfixToPostfix(string expression) {
 		pair<char, int>('*', 3),
 		pair<char, int>('%', 3),
 		pair<char, int>('+', 2),
-		pair<char, int>('-', 2)		
+		pair<char, int>('-', 2)
 	};
-
-	auto evalOp = [](char op, map<char, int> mp) {
-
-		if (mp.find(op) == mp.end())
-		{
-			return -1;
-		}
-
-		return mp.at(op);
-	};
+	
+	/*auto evalOp = [](char op, map<char, int> mp) {
+		return (mp.find(op) == mp.end()) ? -1 : mp.at(op);
+	};*/
 
 	for (size_t i = 0; i < expression.size(); i++)
 	{
 		char currentChar = expression[i];
 
-		if (isalpha(currentChar) || isdigit(currentChar) || currentChar == '.')
+		if (isalpha(currentChar) || isdigit(currentChar) || currentChar == '.' || currentChar == ',')
 		{
 			resultExpression.push_back(currentChar);
 		}
@@ -251,21 +243,19 @@ string convertInfixToPostfix(string expression) {
 		}
 		else if (currentChar == '(')
 		{
-			stack.add(currentChar);
+			stack.push(currentChar);
 		}
 		else
 		{
-			while (!stack.isEmpty() && evalOp(currentChar, opPrecedence) <= evalOp(stack.peek(), opPrecedence))
+			while (!stack.isEmpty()
+				&& stack.peek() != '('
+				&& !(currentChar == '^' && stack.peek() == '^')
+				&& opPrecedence.at(currentChar) <= opPrecedence.at(stack.peek()))
 			{
-				if (currentChar == '^' && stack.peek() == '^')
-				{
-					break;
-				}
-
 				resultExpression.push_back(stack.pop());
 			}
 
-			stack.add(currentChar);
+			stack.push(currentChar);
 		}
 	}
 
@@ -279,10 +269,9 @@ string convertInfixToPostfix(string expression) {
 
 
 void runTests() {
-
+	
 	int queueLength = 6;
-	Queue<int> queue = Queue<int>(queueLength);
-
+	Queue<int> queue = Queue<int>(queueLength);	
 
 	// ---------------------------------- Test 1 ----------------------------------
 
@@ -379,7 +368,7 @@ void runTests() {
 	// ---------------------------------- Test 9 ----------------------------------
 
 	bool test9 = "abcd^e-fgh*+^*+i-" == convertInfixToPostfix("a+b*(c^d-e)^(f+g*h)-i");
-	
+
 	printTestResult(9, test9);
 
 	// ---------------------------------- Test 10 ----------------------------------
@@ -388,16 +377,35 @@ void runTests() {
 
 	printTestResult(10, test10);
 
-	// ---------------------------------- Test 10 ----------------------------------
+	// ---------------------------------- Test 11 ----------------------------------
 
 	bool test11 = "AB+C*D-" == convertInfixToPostfix("(A+B)*C-D");
 
 	printTestResult(11, test11);
+
+	// ---------------------------------- Test 12 ----------------------------------
+
+	bool test12 = "1832^/9-46*+" == convertInfixToPostfix("18/3^2-9+4*6");
+
+	printTestResult(12, test12);
+
+	// ---------------------------------- Test 13 ----------------------------------
+
+	bool test13 = "AB*CD/+" == convertInfixToPostfix("A*B+C/D");
+
+	printTestResult(13, test13);
+
+	// ---------------------------------- Test 14 ----------------------------------
+
+	bool test14 = "ABC*EF-/+" == convertInfixToPostfix("A+B*C/(E-F)");
+
+	printTestResult(14, test14);
 }
 
 
 int main()
 {
+
 	runTests();
 }
 
