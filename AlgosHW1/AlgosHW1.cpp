@@ -9,6 +9,9 @@
 #include <iterator>
 #include <sstream>
 #include <vector>
+#include <iomanip> 
+#include <utility>
+#include <windows.h>
 using namespace std;
 
 template<typename T>
@@ -73,11 +76,13 @@ protected:
 		m_currentCount--;
 	}
 
-	T elementAt(int index) {
-		return storeArray[index];
-	}
-
 	T& operator[](int index) {
+
+		if (index < 0 || index > m_capacity - 1)
+		{
+			throw invalid_argument("Index is outside of range");
+		}
+
 		return storeArray[index];
 	}
 
@@ -102,6 +107,16 @@ public:
 
 	bool isFull() {
 		return m_currentCount == m_capacity;
+	}
+
+	T virtual elementAt(int index) {
+
+		if (index < 0 || index > m_currentCount - 1)
+		{
+			throw invalid_argument("Index is outside of range");
+		}
+
+		return storeArray[index];
 	}
 
 	virtual void clear() = 0;
@@ -149,6 +164,15 @@ public:
 		return ArrayBase<T>::elementAt(ArrayBase<T>::size() - 1);
 	}
 
+	void display() {
+
+		for (int i = 0; i < ArrayBase<T>::size(); i++)
+		{
+			T el = ArrayBase<T>::elementAt(i);
+			cout << el << ' ';
+		}
+	}
+
 	void clear() {
 		ArrayBase<T>::resetSize();
 	}
@@ -159,14 +183,10 @@ class Queue : public ArrayBase<T> {
 
 private:
 
-	int m_first = 0;
-	int m_last = 0;
+	int m_first = -1;
+	int m_last = -1;
 
 public:
-
-	Queue() {
-
-	}
 
 	Queue(int queueSize) : ArrayBase<T>(queueSize) {
 
@@ -174,8 +194,13 @@ public:
 
 	bool enqueue(T next) {
 
+		if (ArrayBase<T>::isEmpty())
+		{
+			m_first = 0;
+		}
+
 		ArrayBase<T>::incCount();
-		m_last = (m_first + ArrayBase<T>::size() - 1) % ArrayBase<T>::capacity();
+		m_last = (m_last + 1) % ArrayBase<T>::capacity();
 		ArrayBase<T>::operator[](m_last) = next;
 
 		return true;
@@ -186,27 +211,77 @@ public:
 		ArrayBase<T>::decCount();
 		m_first = (m_first + 1) % ArrayBase<T>::capacity();
 
-		return ArrayBase<T>::elementAt(dequeuIndex);
+		return ArrayBase<T>::operator[](dequeuIndex);
 	}
 
 	void display() {
 
 		for (int i = 0; i < ArrayBase<T>::size(); i++)
 		{
-			T el = ArrayBase<T>::elementAt((m_first + i) % ArrayBase<T>::capacity());
-			cout << el << endl;
+			T el = ArrayBase<T>::operator[]((m_first + i) % ArrayBase<T>::capacity());
+			cout << el << ' ';
 		}
 	}
 
 	void clear() {
-		m_first = 0;
-		m_last = 0;
+		m_first = -1;
+		m_last = -1;
 		ArrayBase<T>::resetSize();
+	}
+
+	T elementAt(int index) override {
+
+		if (index < 0 || index > ArrayBase<T>::size() - 1)
+		{
+			throw invalid_argument("Index is outside of range");
+		}
+
+		return ArrayBase<T>::operator[]((m_first + index) % ArrayBase<T>::capacity());
 	}
 };
 
 void printTestResult(int testNumber, bool testResult) {
-	cout << "Test " << testNumber << ": " << boolalpha << testResult << endl;
+	cout
+		<< left << setw(5) << "Test "
+		<< right << setw(2) << testNumber << ": "
+		<< setw(5) << (testResult == true ? "passed" : "not passed") << endl;
+}
+
+void printLine(int lenght) {
+	cout << string(lenght, '-') << endl;
+}
+
+template<typename T>
+void printIntermidiateResults(Stack<T> stack, string currentStr, string resultExpression, int iteration) {
+
+	string stackStr;
+	int lenght = 75;
+
+	map<string, int> colWidth{
+		pair<string, int>("element", 10),
+		pair<string, int>("stack", 15),
+		pair<string, int>("result", 50)
+	};
+
+	for (size_t i = 0; i < stack.size(); i++)
+	{
+		stackStr += stack.elementAt(i);
+	}
+
+	if (iteration == 0)
+	{
+		printLine(lenght);
+		cout 
+			<< left << setw(colWidth.at("element")) << "Element" 
+			<< setw(colWidth.at("stack")) << "Stack" 
+			<< left << setw(colWidth.at("result")) << "Result" << endl;
+		printLine(lenght);
+	}
+
+	cout 
+		<< left << setw(colWidth.at("element")) << "  " + currentStr 
+		<< setw(colWidth.at("stack")) << stackStr 
+		<< left << setw(colWidth.at("result")) << resultExpression << endl;
 }
 
 string convertInfixToPostfix(string expression) {
@@ -272,6 +347,8 @@ string convertInfixToPostfix(string expression) {
 
 			stack.push(currentChar);
 		}
+
+		printIntermidiateResults(stack, string(1, currentChar), resultExpression, i);
 	}
 
 	while (!stack.isEmpty())
@@ -388,11 +465,19 @@ void runTests() {
 
 	int queueSize = queue.size();
 
-	for (int i = 0; i < queueSize; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		queue.dequeue();
 	}
 
+	queue.enqueue(7);
+	queue.enqueue(8);
+	
+	for (int i = 0; i < queueSize; i++)
+	{
+		queue.dequeue();
+	}
+	
 	bool test3 = queue.size() == 0;
 
 	printTestResult(3, test3);
@@ -457,7 +542,6 @@ void runTests() {
 
 	// ---------------------------------- Test 10 ----------------------------------
 
-	string test = convertInfixToPostfix("(12.3+4)*15-16");
 	bool test10 = "12.3 4 + 15 * 16 -" == convertInfixToPostfix("(12.3+4)*15-16");
 
 	printTestResult(10, test10);
@@ -563,6 +647,24 @@ void runTests() {
 	bool test27 = 4 == evaluatePostfix("4 16 / 6 - 3 30 / 18 - /");
 
 	printTestResult(27, test27);
+
+	// ---------------------------------- Test 28 ----------------------------------
+
+	bool test28 = "b c * a - a b * c * +" == convertInfixToPostfix("b*c-a+a*b*c");
+
+	printTestResult(28, test28);
+
+	// ---------------------------------- Test 29 ----------------------------------
+
+	bool test29 = "a b c * a + b * +" == convertInfixToPostfix("a+(b*c+a)*b");
+
+	printTestResult(29, test29);
+
+	// ---------------------------------- Test 30 ----------------------------------	
+
+	bool test30 = "a b c * + d - l m * n / k ^ *" == convertInfixToPostfix("(a+b*c-d)*((l*m)/n)^k");
+
+	printTestResult(30, test30);
 }
 
 
