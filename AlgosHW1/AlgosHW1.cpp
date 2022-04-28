@@ -224,18 +224,29 @@ string convertInfixToPostfix(string expression) {
 		pair<char, int>('-', 2)
 	};
 
+	bool prevCharIsOperand = false;
+
 	for (size_t i = 0; i < expression.size(); i++)
 	{
 		char currentChar = expression[i];
 
 		if (isalpha(currentChar) || isdigit(currentChar) || currentChar == '.' || currentChar == ',')
 		{
+			if (!prevCharIsOperand && resultExpression.size() != 0)
+			{
+				resultExpression.push_back(' ');
+			}
+
 			resultExpression.push_back(currentChar);
+			prevCharIsOperand = true;
 		}
 		else if (currentChar == ')')
 		{
+			prevCharIsOperand = false;
+
 			while (stack.peek() != '(')
 			{
+				resultExpression.push_back(' ');
 				resultExpression.push_back(stack.pop());
 			}
 
@@ -243,15 +254,19 @@ string convertInfixToPostfix(string expression) {
 		}
 		else if (currentChar == '(')
 		{
+			prevCharIsOperand = false;
 			stack.push(currentChar);
 		}
 		else
 		{
+			prevCharIsOperand = false;
+
 			while (!stack.isEmpty()
 				&& stack.peek() != '('
 				&& !(currentChar == '^' && stack.peek() == '^')
 				&& opPrecedence.at(currentChar) <= opPrecedence.at(stack.peek()))
 			{
+				resultExpression.push_back(' ');
 				resultExpression.push_back(stack.pop());
 			}
 
@@ -261,6 +276,7 @@ string convertInfixToPostfix(string expression) {
 
 	while (!stack.isEmpty())
 	{
+		resultExpression.push_back(' ');
 		resultExpression.push_back(stack.pop());
 	}
 
@@ -321,9 +337,9 @@ double evaluatePostfix(string expression) {
 				break;
 			case '/':
 				operationResult = firstOperand / secondOperand;
-				break;				
+				break;
 			case '^':
-				operationResult = pow(firstOperand, stod(word));
+				operationResult = pow(firstOperand, secondOperand);
 				break;
 			default:
 				break;
@@ -435,57 +451,118 @@ void runTests() {
 
 	// ---------------------------------- Test 9 ----------------------------------
 
-	bool test9 = "abcd^e-fgh*+^*+i-" == convertInfixToPostfix("a + b * (c^d-e)^(f+g*h)-i");
+	bool test9 = "a b c d ^ e - f g h * + ^ * + i -" == convertInfixToPostfix("a + b * (c^d-e)^(f+g*h)-i");
 
 	printTestResult(9, test9);
 
 	// ---------------------------------- Test 10 ----------------------------------
 
-	bool test10 = "12.34+15*16-" == convertInfixToPostfix("(12.3+4)*15-16");
+	string test = convertInfixToPostfix("(12.3+4)*15-16");
+	bool test10 = "12.3 4 + 15 * 16 -" == convertInfixToPostfix("(12.3+4)*15-16");
 
 	printTestResult(10, test10);
 
 	// ---------------------------------- Test 11 ----------------------------------
 
-	bool test11 = "AB+C*D-" == convertInfixToPostfix("(A+B)*C-D");
+	bool test11 = "A B + C * D -" == convertInfixToPostfix("(A+B)*C-D");
 
 	printTestResult(11, test11);
 
 	// ---------------------------------- Test 12 ----------------------------------
 
-	bool test12 = "1832^/9-46*+" == convertInfixToPostfix("18/3^2-9+4*6");
+	bool test12 = "18 3 2 ^ / 9 - 4 6 * +" == convertInfixToPostfix("18/3^2-9+4*6");
 
 	printTestResult(12, test12);
 
 	// ---------------------------------- Test 13 ----------------------------------
 
-	bool test13 = "AB*CD/+" == convertInfixToPostfix("A*B+C/D");
+	bool test13 = "A B * C D / +" == convertInfixToPostfix("A*B+C/D");
 
 	printTestResult(13, test13);
 
 	// ---------------------------------- Test 14 ----------------------------------
 
-	bool test14 = "ABC*EF-/+" == convertInfixToPostfix("A+B*C/(E-F)");
+	bool test14 = "A B C * E F - / +" == convertInfixToPostfix("A+B*C/(E-F)");
 
 	printTestResult(14, test14);
 
 	// ---------------------------------- Test 15 ----------------------------------
 
-	bool test15 = 7 == evaluatePostfix("3 2 2 * +");
+	bool test15 = "a b + c d - ^ m n + *" == convertInfixToPostfix("(a + b) ^(c - d) * (m + n)");
 
 	printTestResult(15, test15);
 
 	// ---------------------------------- Test 16 ----------------------------------
 
-	bool test16 = 7 == evaluatePostfix("3 2 2 * +");
+	bool test16 = "a b + d c ^ -" == convertInfixToPostfix("a+b-d^c");
 
 	printTestResult(16, test16);
 
 	// ---------------------------------- Test 17 ----------------------------------
 
-	bool test17 = 70 == evaluatePostfix("3 30 / 6 3 11 18 36 / + - * + ");
+	bool test17 = "10 3 * 15 5 / +" == convertInfixToPostfix("10*3+15/5");
 
 	printTestResult(17, test17);
+
+	// ---------------------------------- Test 18 ----------------------------------
+
+	bool test18 = "5 10 + 12 9 - * 3 /" == convertInfixToPostfix("(5+10)*(12-9)/3");
+
+	printTestResult(18, test18);
+
+	// ---------------------------------- Test 19 ----------------------------------
+
+	bool test19 = "a b * c + d ^ a b - c d + / +" == convertInfixToPostfix("(a*b + c)^d+(a-b)/(c+d)");
+
+	printTestResult(19, test19);
+
+	// ---------------------------------- Test 20 ----------------------------------
+
+	bool test20 = 7 == evaluatePostfix("3 2 2 * +");
+
+	printTestResult(20, test20);
+
+	// ---------------------------------- Test 21 ----------------------------------
+
+	bool test21 = 7 == evaluatePostfix("3 2 2 * +");
+
+	printTestResult(21, test21);
+
+	// ---------------------------------- Test 22 ----------------------------------
+
+	bool test22 = 70 == evaluatePostfix("3 30 / 6 3 11 18 36 / + - * + ");
+
+	printTestResult(22, test22);
+
+	// ---------------------------------- Test 23 ----------------------------------
+
+	bool test23 = 15 == evaluatePostfix("3 9 12 - / 10 5 + *");
+
+	printTestResult(23, test23);
+
+	// ---------------------------------- Test 24 ----------------------------------
+
+	bool test24 = 49 == evaluatePostfix("6 7 - 2 3 4 + ^ *");
+
+	printTestResult(24, test24);
+
+	// ---------------------------------- Test 25 ----------------------------------
+
+	bool test25 = 4 == evaluatePostfix("2 25 100 / - 40 6 8 * - /");
+
+	printTestResult(25, test25);
+
+	// ---------------------------------- Test 26 ----------------------------------
+
+	bool test26 = 5 == evaluatePostfix("1 23 11 17 + - 85 100 - / + 4 64 80 - + /");
+
+	printTestResult(26, test26);
+
+	// ---------------------------------- Test 27 ----------------------------------
+
+	bool test27 = 4 == evaluatePostfix("4 16 / 6 - 3 30 / 18 - /");
+
+	printTestResult(27, test27);
 }
 
 
