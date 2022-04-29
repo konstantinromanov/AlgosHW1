@@ -183,7 +183,7 @@ class Queue : public ArrayBase<T> {
 
 private:
 
-	int m_first = -1;
+	int m_first = 0;
 	int m_last = -1;
 
 public:
@@ -194,10 +194,10 @@ public:
 
 	bool enqueue(T next) {
 
-		if (ArrayBase<T>::isEmpty())
+		/*if (ArrayBase<T>::isEmpty())
 		{
 			m_first = 0;
-		}
+		}*/
 
 		ArrayBase<T>::incCount();
 		m_last = (m_last + 1) % ArrayBase<T>::capacity();
@@ -224,7 +224,7 @@ public:
 	}
 
 	void clear() {
-		m_first = -1;
+		m_first = 0;
 		m_last = -1;
 		ArrayBase<T>::resetSize();
 	}
@@ -252,35 +252,43 @@ void printLine(int lenght) {
 }
 
 template<typename T>
-void printIntermidiateResults(Stack<T> stack, string currentStr, string resultExpression, int iteration) {
+std::string toString(T val)
+{
+	std::stringstream ss("");
+	ss << val;
+	return ss.str();
+}
+
+template<typename T>
+void printIntermidiateResults(Stack<T> stack, string resultExpression, string currentStr = "", int iteration = -1) {
 
 	string stackStr;
 	int lenght = 75;
 
 	map<string, int> colWidth{
 		pair<string, int>("element", 10),
-		pair<string, int>("stack", 15),
+		pair<string, int>("stack", 25),
 		pair<string, int>("result", 50)
 	};
 
 	for (size_t i = 0; i < stack.size(); i++)
 	{
-		stackStr += stack.elementAt(i);
+		stackStr += toString(stack.elementAt(i)) + ' ';
 	}
 
 	if (iteration == 0)
 	{
 		printLine(lenght);
-		cout 
-			<< left << setw(colWidth.at("element")) << "Element" 
-			<< setw(colWidth.at("stack")) << "Stack" 
+		cout
+			<< left << setw(colWidth.at("element")) << "Element"
+			<< setw(colWidth.at("stack")) << "Stack"
 			<< left << setw(colWidth.at("result")) << "Result" << endl;
 		printLine(lenght);
 	}
 
-	cout 
-		<< left << setw(colWidth.at("element")) << "  " + currentStr 
-		<< setw(colWidth.at("stack")) << stackStr 
+	cout
+		<< left << setw(colWidth.at("element")) << "  " + currentStr
+		<< setw(colWidth.at("stack")) << stackStr
 		<< left << setw(colWidth.at("result")) << resultExpression << endl;
 }
 
@@ -348,13 +356,15 @@ string convertInfixToPostfix(string expression) {
 			stack.push(currentChar);
 		}
 
-		printIntermidiateResults(stack, string(1, currentChar), resultExpression, i);
+		printIntermidiateResults(stack, resultExpression, string(1, currentChar), i);
 	}
 
 	while (!stack.isEmpty())
 	{
 		resultExpression.push_back(' ');
 		resultExpression.push_back(stack.pop());
+
+		printIntermidiateResults(stack, resultExpression);
 	}
 
 	return resultExpression;
@@ -383,8 +393,7 @@ double evaluatePostfix(string expression) {
 
 		words.push_back(word.c_str());
 	}
-
-	double resultExpression;
+		
 	Stack<double> stack = Stack<double>(expression.size());
 
 	for (size_t i = 0; i < words.size(); i++)
@@ -397,8 +406,9 @@ double evaluatePostfix(string expression) {
 		}
 		else
 		{
-			double firstOperand = double(stack.pop());
 			double secondOperand = double(stack.pop());
+			double firstOperand = double(stack.pop());
+			
 			double operationResult = 0.0;
 
 			switch (word.at(0))
@@ -424,6 +434,10 @@ double evaluatePostfix(string expression) {
 
 			stack.push(operationResult);
 		}
+
+		stringstream stream;
+		stream << fixed << setprecision(2) << stack.peek();
+		printIntermidiateResults(stack, stream.str(), word, i);
 	}
 
 	return stack.pop();
@@ -472,12 +486,12 @@ void runTests() {
 
 	queue.enqueue(7);
 	queue.enqueue(8);
-	
+
 	for (int i = 0; i < queueSize; i++)
 	{
 		queue.dequeue();
 	}
-	
+
 	bool test3 = queue.size() == 0;
 
 	printTestResult(3, test3);
@@ -613,43 +627,43 @@ void runTests() {
 	printTestResult(21, test21);
 
 	// ---------------------------------- Test 22 ----------------------------------
-
-	bool test22 = 70 == evaluatePostfix("3 30 / 6 3 11 18 36 / + - * + ");
+	
+	bool test22 = -50.899999999999999 == evaluatePostfix("3 30 / 6 3 11 18 36 / + - * + ");
 
 	printTestResult(22, test22);
 
 	// ---------------------------------- Test 23 ----------------------------------
-
-	bool test23 = 15 == evaluatePostfix("3 9 12 - / 10 5 + *");
+	
+	bool test23 = -15 == evaluatePostfix("3 9 12 - / 10 5 + *");
 
 	printTestResult(23, test23);
 
 	// ---------------------------------- Test 24 ----------------------------------
-
-	bool test24 = 49 == evaluatePostfix("6 7 - 2 3 4 + ^ *");
+	
+	bool test24 = -128 == evaluatePostfix("6 7 - 2 3 4 + ^ *");
 
 	printTestResult(24, test24);
 
 	// ---------------------------------- Test 25 ----------------------------------
-
-	bool test25 = 4 == evaluatePostfix("2 25 100 / - 40 6 8 * - /");
+	
+	bool test25 = -0.21875 == evaluatePostfix("2 25 100 / - 40 6 8 * - /");
 
 	printTestResult(25, test25);
 
 	// ---------------------------------- Test 26 ----------------------------------
-
-	bool test26 = 5 == evaluatePostfix("1 23 11 17 + - 85 100 - / + 4 64 80 - + /");
+	
+	bool test26 = -0.11111111111111110 == evaluatePostfix("1 23 11 17 + - 85 100 - / + 4 64 80 - + /");
 
 	printTestResult(26, test26);
 
 	// ---------------------------------- Test 27 ----------------------------------
-
-	bool test27 = 4 == evaluatePostfix("4 16 / 6 - 3 30 / 18 - /");
+	
+	bool test27 = 0.32122905027932963 == evaluatePostfix("4 16 / 6 - 3 30 / 18 - /");
 
 	printTestResult(27, test27);
 
 	// ---------------------------------- Test 28 ----------------------------------
-
+	
 	bool test28 = "b c * a - a b * c * +" == convertInfixToPostfix("b*c-a+a*b*c");
 
 	printTestResult(28, test28);
@@ -665,11 +679,63 @@ void runTests() {
 	bool test30 = "a b c * + d - l m * n / k ^ *" == convertInfixToPostfix("(a+b*c-d)*((l*m)/n)^k");
 
 	printTestResult(30, test30);
+
+	// ---------------------------------- Test 31 ----------------------------------
+	
+	bool test31 = 30.333333333333332 == evaluatePostfix("5 15 / 3 10 * +");
+
+	printTestResult(31, test31);
+
+	// ---------------------------------- Test 32 ----------------------------------
+	
+	bool test32 = -55.333333333333336 == evaluatePostfix("12 7 11 * - 1 4 12 / - 9 + +");
+
+	printTestResult(32, test32);
+}
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+string readFileIntoString2(const string& path) {
+	auto ss = ostringstream{};
+	ifstream input_file(path);
+	if (!input_file.is_open()) {
+		cerr << "Could not open the file - '"
+			<< path << "'" << endl;
+		exit(EXIT_FAILURE);
+	}
+	ss << input_file.rdbuf();
+	return ss.str();
 }
 
 
+
 int main()
-{
+{	
+	bool test25 = 4 == evaluatePostfix("2 25 /");
+	/*string filename("C:/Users/konstantins.romanovs/Documents/homework1-1.txt");
+	string file_content;
+
+	file_content = readFileIntoString2(filename);
+	cout << file_content << endl;*/
+
+	std::ifstream myfile;
+	myfile.open("homework1-1.txt");
+	std::string myline;
+
+	if (myfile.is_open())
+	{
+		while (myfile.good())
+		{
+			std::getline(myfile, myline);
+			std::cout << myline << '\n';
+		}
+	}
+	else {
+		std::cout << "Couldn't open file\n";
+	}
+
 	runTests();
 }
 
