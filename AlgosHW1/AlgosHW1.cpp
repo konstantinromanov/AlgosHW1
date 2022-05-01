@@ -12,6 +12,8 @@
 #include <iomanip> 
 #include <utility>
 #include <windows.h>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 template<typename T>
@@ -127,7 +129,13 @@ class Stack : public ArrayBase<T> {
 
 public:
 
-	Stack(int stackSize) : ArrayBase<T>(stackSize) {
+	Stack(int stackSize) : ArrayBase<T>(stackSize)
+	{
+
+	}
+
+	Stack() : ArrayBase<T>()
+	{
 
 	}
 
@@ -192,12 +200,12 @@ public:
 
 	}
 
-	bool enqueue(T next) {
+	Queue() : ArrayBase<T>()
+	{
 
-		/*if (ArrayBase<T>::isEmpty())
-		{
-			m_first = 0;
-		}*/
+	}
+
+	bool enqueue(T next) {
 
 		ArrayBase<T>::incCount();
 		m_last = (m_last + 1) % ArrayBase<T>::capacity();
@@ -393,7 +401,7 @@ double evaluatePostfix(string expression) {
 
 		words.push_back(word.c_str());
 	}
-		
+
 	Stack<double> stack = Stack<double>(expression.size());
 
 	for (size_t i = 0; i < words.size(); i++)
@@ -408,7 +416,7 @@ double evaluatePostfix(string expression) {
 		{
 			double secondOperand = double(stack.pop());
 			double firstOperand = double(stack.pop());
-			
+
 			double operationResult = 0.0;
 
 			switch (word.at(0))
@@ -627,43 +635,43 @@ void runTests() {
 	printTestResult(21, test21);
 
 	// ---------------------------------- Test 22 ----------------------------------
-	
+
 	bool test22 = -50.899999999999999 == evaluatePostfix("3 30 / 6 3 11 18 36 / + - * + ");
 
 	printTestResult(22, test22);
 
 	// ---------------------------------- Test 23 ----------------------------------
-	
+
 	bool test23 = -15 == evaluatePostfix("3 9 12 - / 10 5 + *");
 
 	printTestResult(23, test23);
 
 	// ---------------------------------- Test 24 ----------------------------------
-	
+
 	bool test24 = -128 == evaluatePostfix("6 7 - 2 3 4 + ^ *");
 
 	printTestResult(24, test24);
 
 	// ---------------------------------- Test 25 ----------------------------------
-	
+
 	bool test25 = -0.21875 == evaluatePostfix("2 25 100 / - 40 6 8 * - /");
 
 	printTestResult(25, test25);
 
 	// ---------------------------------- Test 26 ----------------------------------
-	
+
 	bool test26 = -0.11111111111111110 == evaluatePostfix("1 23 11 17 + - 85 100 - / + 4 64 80 - + /");
 
 	printTestResult(26, test26);
 
 	// ---------------------------------- Test 27 ----------------------------------
-	
+
 	bool test27 = 0.32122905027932963 == evaluatePostfix("4 16 / 6 - 3 30 / 18 - /");
 
 	printTestResult(27, test27);
 
 	// ---------------------------------- Test 28 ----------------------------------
-	
+
 	bool test28 = "b c * a - a b * c * +" == convertInfixToPostfix("b*c-a+a*b*c");
 
 	printTestResult(28, test28);
@@ -681,60 +689,151 @@ void runTests() {
 	printTestResult(30, test30);
 
 	// ---------------------------------- Test 31 ----------------------------------
-	
+
 	bool test31 = 30.333333333333332 == evaluatePostfix("5 15 / 3 10 * +");
 
 	printTestResult(31, test31);
 
 	// ---------------------------------- Test 32 ----------------------------------
-	
+
 	bool test32 = -55.333333333333336 == evaluatePostfix("12 7 11 * - 1 4 12 / - 9 + +");
 
 	printTestResult(32, test32);
 }
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
+template<typename T>
+bool readInputFromFile(const string& path, Queue<T>& queue) {
 
-string readFileIntoString2(const string& path) {
-	auto ss = ostringstream{};
-	ifstream input_file(path);
-	if (!input_file.is_open()) {
-		cerr << "Could not open the file - '"
-			<< path << "'" << endl;
-		exit(EXIT_FAILURE);
+	ifstream file;
+	file.open(path);
+
+	if (file.is_open())
+	{
+		for (string s; file >> s;)
+		{
+			queue.enqueue(s);
+		}
+
+		return true;
 	}
-	ss << input_file.rdbuf();
-	return ss.str();
+	else
+	{
+		return false;
+	}
 }
 
+void printMenu(vector<string>& menuItems) {
 
+	printLine(30);
+	cout << setw(10) << "Menu" << endl;
 
-int main()
-{	
-	bool test25 = 4 == evaluatePostfix("2 25 /");
-	/*string filename("C:/Users/konstantins.romanovs/Documents/homework1-1.txt");
-	string file_content;
-
-	file_content = readFileIntoString2(filename);
-	cout << file_content << endl;*/
-
-	std::ifstream myfile;
-	myfile.open("homework1-1.txt");
-	std::string myline;
-
-	if (myfile.is_open())
+	for (size_t i = 0; i < menuItems.size(); i++)
 	{
-		while (myfile.good())
+		cout << i + 1 << ' ' << menuItems[i] << endl;
+	}
+}
+
+bool isValidInput(string input) {
+
+	for (const char c : input)
+	{
+		if (!isalnum(c))
 		{
-			std::getline(myfile, myline);
-			std::cout << myline << '\n';
+			return false;
 		}
 	}
-	else {
-		std::cout << "Couldn't open file\n";
-	}
+
+	return true;
+}
+
+void runApp() {
+
+	string filePath = "homework1-1.txt"; // place input file in the same directory as this file.
+
+	Queue<string> queueFromFile = Queue<string>(50);
+	bool readSuccess = readInputFromFile(filePath, queueFromFile);
+
+	vector<string> menuItems = {
+		"to add an element",
+		"to delete an element",
+		"to check whether a queue is empty",
+		"to check whether a queue is full",
+		"to print a queue",
+		"to clear a queue",
+		"to output the size of a queue"
+	};
+
+	printMenu(menuItems);
+
+	string userInput;
+	string queueElementInput;
+	int choice = 0;
+	bool exitProgram = false;
+
+	do
+	{
+		cout << "Choose operation (1 - 7) or 'E' to exit: ";
+		cin >> userInput;
+
+		if (!isValidInput(userInput))
+		{
+			cout << "invalid input" << endl;
+			continue;
+		}
+
+		try
+		{
+			choice = stoi(userInput);
+
+			switch (choice)
+			{
+			case 1:
+				cout << "Enter a number: ";
+				cin >> queueElementInput;
+				queueFromFile.enqueue(queueElementInput);
+				break;
+			case 2:
+				queueFromFile.dequeue();
+			case 3:
+				cout << "Queue is " << (queueFromFile.isEmpty() ? "empty!" : "not empty!") << endl;
+				break;
+			case 4:
+				cout << "Queue is " << (queueFromFile.isFull() ? "full!" : "not full!") << endl;
+				break;
+			case 5:
+				cout << "Queue contains: " << endl;
+				queueFromFile.display();
+				cout << endl;
+				break;
+			case 6:
+				queueFromFile.clear();
+				cout << "Queue is empty now: " << endl;
+				break;
+			case 7:
+				cout << "Queue size is: " << queueFromFile.size() << endl;
+				break;
+			default:
+				cout << "invalid input" << endl;
+				break;
+			}
+		}
+		catch (const std::exception&)
+		{
+			if (userInput == "e" || userInput == "E")
+			{
+				exitProgram = true;
+			}
+		}
+
+	} while (exitProgram == false);
+
+	cout << "Exit app" << endl;
+	printLine(30);
+}
+
+int main()
+{
+	runApp();
 
 	runTests();
 }
