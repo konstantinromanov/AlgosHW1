@@ -140,6 +140,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AlgosHW1.cpp" />
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="ArrayBase.cpp" />
+    <ClCompile Include="ConversionService.cpp" />
+    <ClCompile Include="PrintService.cpp" />
+    <ClCompile Include="Queue.cpp" />
+    <ClCompile Include="Stack.cpp" />
+    <ClCompile Include="Tests.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="ArrayBase.h" />
+    <ClInclude Include="ConversionService.h" />
+    <ClInclude Include="PrintService.h" />
+    <ClInclude Include="Queue.h" />
+    <ClInclude Include="Stack.h" />
+    <ClInclude Include="Tests.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
