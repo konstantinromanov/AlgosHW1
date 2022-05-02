@@ -143,7 +143,6 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="ArrayBase.cpp" />
     <ClCompile Include="ConversionService.cpp" />
-    <ClCompile Include="PrintService.cpp" />
     <ClCompile Include="Queue.cpp" />
     <ClCompile Include="Stack.cpp" />
     <ClCompile Include="Tests.cpp" />

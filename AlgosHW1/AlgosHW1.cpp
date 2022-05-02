@@ -29,8 +29,8 @@ int main()
 	App app = App(printService);
 	Tests tests = Tests(printService, conversionService);
 
-	app.RunApp();	
-	tests.RunTests();
+	app.RunApp(); // App implements task 3 of the Homework.
+	tests.RunTests(); // Homework task 1 is printed as Test 12 to console, task 2 - as Test 22.
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

@@ -27,9 +27,6 @@
     <ClCompile Include="Queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PrintService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ConversionService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
