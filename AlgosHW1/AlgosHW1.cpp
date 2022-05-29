@@ -10,15 +10,7 @@
 #include <vector>
 #include <iomanip> 
 #include <utility>
-//#include <windows.h>
 #include <fstream>
-//#include "ArrayBase.h"
-//#include "Stack.h"
-//#include "Queue.h"
-//#include "PrintService.h"
-//#include "ConversionService.h"
-//#include "App.h"
-//#include "Tests.h"
 #include <cmath>
 #include <algorithm>
 
@@ -55,11 +47,6 @@ public:
 	T virtual elementAt(int);
 	virtual void clear() = 0;
 };
-
-//typedef ArrayBase<int>;
-//typedef ArrayBase<double>;
-//typedef ArrayBase<char>;
-//typedef ArrayBase<std::string>;
 
 // ------------------------------------------- End of ArrayBase Header -----------------------------------------------
 
